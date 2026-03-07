@@ -1,0 +1,211 @@
+:root {
+    /*Основные цвета*/
+    --primary-dark: #1f3a5f;
+    --primary-medium: #2b4a78;
+    --primary-light: #3d5a80;
+    --primary-soft: rgba(61, 90, 128, 0.2);
+    
+    /*Фоновые цвета*/
+    --bg-body: #eef2f7;
+    --bg-container: #ffffff;
+    --bg-result: #edf2f9;
+    --bg-error: #fff5f5;
+    
+    /*Цвета текста*/
+    --text-dark: #1e2f44;
+    --text-medium: #4a6a8b;
+    --text-light: #6b85a4;
+    --text-soft: #102331;
+    
+    /*Цвета границ*/
+    --border-default: #d0ddee;
+    --border-light: #c1d3e9;
+    --border-dashed: #aec3dd;
+    
+    /*Цвета ошибок*/
+    --error-primary: #c44545;
+    --error-bg: #fff5f5;
+    --error-shadow: rgba(196, 69, 69, 0.4);
+    
+    /*Тени*/
+    --shadow-container: 0 20px 40px rgba(0, 0, 0, 0.15);
+    --shadow-popup: 0 4px 10px var(--error-shadow);
+    
+    /*Анимации*/
+    --transition-fast: 0.15s;
+    --transition-normal: 0.2s;
+    --transition-slow: 0.3s;
+}
+
+/*Общие стили*/
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg-body);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: var(--bg-container);
+    border-radius: 24px;
+    box-shadow: var(--shadow-container);
+    width: 100%;
+    max-width: 450px;
+    padding: 35px 30px;
+}
+
+/*Заголовки*/
+h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    color: var(--primary-dark);
+}
+
+.subtitle {
+    color: var(--text-medium);
+    margin-bottom: 30px;
+    border-left: 4px solid var(--primary-light);
+    padding-left: 15px;
+    font-size: 1rem;
+}
+
+/* Форма*/
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+input {
+    width: 100%;
+    padding: 15px 18px;
+    font-size: 1.1rem;
+    border: 2px solid var(--border-default);
+    border-radius: 16px;
+    outline: none;
+    transition: var(--transition-normal);
+}
+
+input:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+input.error-border {
+    border-color: var(--error-primary);
+    background: var(--error-bg);
+}
+
+/*Кнопка*/
+.button {
+    background: var(--primary-dark);
+    color: white;
+    border: none;
+    padding: 16px 25px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 40px;
+    width: 100%;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    margin-top: 10px;
+}
+
+.button:hover {
+    background: var(--primary-medium);
+}
+
+/*Блок результата*/
+.result-box {
+    background: var(--bg-result);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 30px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    border: 1px solid var(--border-light);
+    color: var(--text-soft);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.footer-note {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    text-align: right;
+    margin-top: 15px;
+    border-top: 1px dashed var(--border-dashed);
+    padding-top: 12px;
+}
+
+/*Всплывающие ошибки*/
+.popup-error {
+    position: absolute;
+    background: var(--error-primary);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    top: -10px;
+    right: 10px;
+    z-index: 100;
+    box-shadow: var(--shadow-popup);
+    animation: slideDown var(--transition-slow) ease;
+}
+
+.popup-error::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--error-primary);
+}
+
+/*Подсказка о возрасте*/
+.age-hint {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 5px;
+    padding-left: 5px;
+}
+
+/*Анимации*/
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.button {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1;
+}
