@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         //Определение сообщения по возрасту
         if (age < 18) {
-            showGlobalPopup(`${name}, доступ ограничен (меньше 18 лет)`, 'warning');
+            showGlobalPopup(`${name}, доступ ограничен`, 'warning');
         } else if (age >= 18 && age <= 65) {
             showGlobalPopup(`${name}, доступ разрешен`, 'success');
         } else {
