@@ -8,32 +8,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const usernameInput = document.getElementById('username');
     const ageInput = document.getElementById('age');
     const checkButton = document.getElementById('checkBtn');
-    const outputDiv = document.getElementById('outputMessage');
     const form = document.getElementById('registerForm');
 
-    //Функция для отображения сообщения
-    function setSuccessMessage(text) {
-        if (outputDiv) {
-            outputDiv.textContent = text;
-            outputDiv.style.color = 'var(--text-soft)';
-        }
-    }
-
-    //Функция для очистки сообщения
-    function clearMessage() {
-        if (outputDiv) {
-            outputDiv.textContent = ''; 
-        }
-    }
-
-    //Функция для удаления всех всплывающих ошибок
+    //Функция для удаления всех всплывающих элементов
     function removeAllPopups() {
-        const popups = document.querySelectorAll('.popup-error');
-        popups.forEach(popup => popup.remove());
+        //Удаляем всплывающие ошибки у полей
+        const fieldPopups = document.querySelectorAll('.popup-error');
+        fieldPopups.forEach(popup => popup.remove());
+        
+        //Удаляем глобальные всплывающие уведомления
+        const globalPopups = document.querySelectorAll('.global-popup');
+        globalPopups.forEach(popup => popup.remove());
     }
 
-    //Функция для показа всплывающей ошибки
-    function showPopupError(element, message) {
+    //Функция для показа всплывающей ошибки у поля
+    function showFieldError(element, message) {
         if (!element) return;
         
         //Удаляем предыдущие всплывающие ошибки у этого элемента
@@ -54,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (formGroup) {
             formGroup.appendChild(popup);
             
+            //Автоматически скрываем через 3 секунды
             setTimeout(() => {
                 if (popup.parentNode) {
                     popup.remove();
@@ -62,6 +52,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    //Функция для показа глобального всплывающего уведомления
+    function showGlobalPopup(message, type = 'info') {
+        //Удаляем предыдущее глобальное уведомление
+        const existingGlobal = document.querySelector('.global-popup');
+        if (existingGlobal) {
+            existingGlobal.remove();
+        }
+        
+        //Создаем элемент уведомления
+        const popup = document.createElement('div');
+        popup.className = `global-popup ${type}`;
+        popup.textContent = message;
+        
+        //Добавляем на страницу
+        document.body.appendChild(popup);
+        
+        //Автоматически скрываем через 3 секунды
+        setTimeout(() => {
+            if (popup.parentNode) {
+                popup.remove();
+            }
+        }, 3000);
+    }
+
+    //Функция для сброса ошибок
     function resetErrors() {
         if (usernameInput) usernameInput.classList.remove('error-border');
         if (ageInput) ageInput.classList.remove('error-border');
@@ -77,26 +92,29 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkAccess() {
         console.log('checkAccess вызван');
         
+        //Сброс ошибок
         resetErrors();
-        clearMessage(); 
 
+        //Считываем значения
         const name = usernameInput ? usernameInput.value.trim() : '';
         const ageString = ageInput ? ageInput.value.trim() : '';
 
         console.log('Имя:', name, 'Возраст:', ageString);
 
+        //Проверка имени
         if (name === '') {
             if (usernameInput) {
                 usernameInput.classList.add('error-border');
-                showPopupError(usernameInput, 'Имя не может быть пустым');
+                showFieldError(usernameInput, 'Имя не может быть пустым');
             }
             return;
         }
 
+        //Проверка возраста
         if (ageString === '') {
             if (ageInput) {
                 ageInput.classList.add('error-border');
-                showPopupError(ageInput, 'Укажите возраст');
+                showFieldError(ageInput, 'Укажите возраст');
             }
             return;
         }
@@ -108,32 +126,26 @@ document.addEventListener('DOMContentLoaded', function() {
             if (ageInput) {
                 ageInput.classList.add('error-border');
                 if (age > MAX_AGE) {
-                    showPopupError(ageInput, `Возраст не может превышать ${MAX_AGE} лет`);
+                    showFieldError(ageInput, `Возраст не может превышать ${MAX_AGE} лет`);
                 } else if (age <= 0) {
-                    showPopupError(ageInput, 'Возраст должен быть больше 0');
+                    showFieldError(ageInput, 'Возраст должен быть больше 0');
                 } else if (!Number.isInteger(age)) {
-                    showPopupError(ageInput, 'Возраст должен быть целым числом');
+                    showFieldError(ageInput, 'Возраст должен быть целым числом');
                 } else {
-                    showPopupError(ageInput, 'Введите корректный возраст');
+                    showFieldError(ageInput, 'Введите корректный возраст');
                 }
             }
             return;
         }
 
         //Определение сообщения по возрасту
-        let accessMessage = '';
-        
         if (age < 18) {
-            accessMessage = 'Доступ ограничен';
+            showGlobalPopup(`${name}, доступ ограничен (меньше 18 лет)`, 'warning');
         } else if (age >= 18 && age <= 65) {
-            accessMessage = 'Доступ разрешен';
+            showGlobalPopup(`${name}, доступ разрешен`, 'success');
         } else {
-            accessMessage = 'Рекомендуется упрощенный режим';
+            showGlobalPopup(`${name}, рекомендуется упрощенный режим`, 'info');
         }
-
-        //Выводим результат с именем
-        setSuccessMessage(`${name}, ${accessMessage}`);
-        console.log('Результат:', `${name}, ${accessMessage}`);
     }
 
     //Добавляем обработчик клика на кнопку
@@ -142,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Обработчик клика добавлен на кнопку');
     }
 
+    //Блокируем отправку формы 
     if (form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -152,45 +165,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Функция для обработки изменений в полях
     function handleInputChange() {
-        clearMessage();
+        //Убираем красные рамки
         if (usernameInput) usernameInput.classList.remove('error-border');
         if (ageInput) ageInput.classList.remove('error-border');
+        //Убираем все всплывающие элементы
         removeAllPopups();
     }
 
     //Убираем красную рамку и всплывающие ошибки при начале ввода
     if (usernameInput) {
-        usernameInput.addEventListener('input', function() {
-            handleInputChange();
-        });
-        
-        //убираем ошибку при клике на поле
-        usernameInput.addEventListener('click', function() {
-            handleInputChange();
-        });
-        
-        //Очищаем сообщение при фокусе на поле
-        usernameInput.addEventListener('focus', function() {
-            clearMessage();
-        });
+        usernameInput.addEventListener('input', handleInputChange);
+        usernameInput.addEventListener('click', handleInputChange);
+        usernameInput.addEventListener('focus', handleInputChange);
     }
     
     if (ageInput) {
-        ageInput.addEventListener('input', function() {
-            handleInputChange();
-        });
+        ageInput.addEventListener('input', handleInputChange);
+        ageInput.addEventListener('click', handleInputChange);
+        ageInput.addEventListener('focus', handleInputChange);
         
-        //убираем ошибку при клике на поле
-        ageInput.addEventListener('click', function() {
-            handleInputChange();
-        });
-        
-        //Очищаем сообщение при фокусе на поле
-        ageInput.addEventListener('focus', function() {
-            clearMessage();
-        });
-        
-        //Проверка при потере фокуса 
+        //Проверка при потере фокуса
         ageInput.addEventListener('blur', function() {
             const ageString = this.value.trim();
             if (ageString !== '') {
@@ -198,11 +192,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!isValidAge(age)) {
                     this.classList.add('error-border');
                     if (age > MAX_AGE) {
-                        showPopupError(this, `Максимальный возраст: ${MAX_AGE} лет`);
+                        showFieldError(this, `Максимальный возраст: ${MAX_AGE} лет`);
                     } else if (age <= 0) {
-                        showPopupError(this, 'Возраст должен быть больше 0');
+                        showFieldError(this, 'Возраст должен быть больше 0');
                     } else if (!Number.isInteger(age)) {
-                        showPopupError(this, 'Введите целое число');
+                        showFieldError(this, 'Введите целое число');
                     }
                 }
             }
@@ -215,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = this.value.trim();
             if (name === '') {
                 this.classList.add('error-border');
-                showPopupError(this, 'Имя обязательно для заполнения');
+                showFieldError(this, 'Имя обязательно для заполнения');
             }
         });
     }
@@ -227,12 +221,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isNaN(value)) {
                 if (value > MAX_AGE) {
                     this.value = MAX_AGE;
-                    showPopupError(this, `Значение установлено на ${MAX_AGE}`);
-                    clearMessage(); // Очищаем сообщение при корректировке
+                    showFieldError(this, `Значение установлено на ${MAX_AGE}`);
                 } else if (value < 1) {
                     this.value = 1;
-                    showPopupError(this, 'Значение установлено на 1');
-                    clearMessage(); // Очищаем сообщение при корректировке
+                    showFieldError(this, 'Значение установлено на 1');
                 }
             }
         });
