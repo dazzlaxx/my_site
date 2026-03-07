@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM загружен, скрипт работает');
     
-    //Константа для максимального возраста
     const MAX_AGE = 100;
     
     //Получаем ссылки на элементы страницы
@@ -12,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Функция для удаления всех всплывающих элементов
     function removeAllPopups() {
-        //Удаляем всплывающие ошибки у полей
         const fieldPopups = document.querySelectorAll('.popup-error');
         fieldPopups.forEach(popup => popup.remove());
         
@@ -52,9 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    //Функция для показа глобального всплывающего уведомления
     function showGlobalPopup(message, type = 'info') {
-        //Удаляем предыдущее глобальное уведомление
         const existingGlobal = document.querySelector('.global-popup');
         if (existingGlobal) {
             existingGlobal.remove();
@@ -65,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
         popup.className = `global-popup ${type}`;
         popup.textContent = message;
         
-        //Добавляем на страницу
         document.body.appendChild(popup);
         
         //Автоматически скрываем через 3 секунды
@@ -76,23 +71,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 
-    //Функция для сброса ошибок
     function resetErrors() {
         if (usernameInput) usernameInput.classList.remove('error-border');
         if (ageInput) ageInput.classList.remove('error-border');
         removeAllPopups();
     }
 
-    //Функция проверки возраста с учетом верхней границы
     function isValidAge(age) {
         return !isNaN(age) && age > 0 && age <= MAX_AGE && Number.isInteger(age);
     }
 
-    //Функция проверки и обработки данных
     function checkAccess() {
         console.log('checkAccess вызван');
         
-        //Сброс ошибок
         resetErrors();
 
         //Считываем значения
@@ -121,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const age = Number(ageString);
         
-        //Проверка, что возраст - число больше 0 и не превышает MAX_AGE
+        //Проверка, что возраст - число больше 0 и не превышает 100
         if (!isValidAge(age)) {
             if (ageInput) {
                 ageInput.classList.add('error-border');
@@ -148,13 +139,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    //Добавляем обработчик клика на кнопку
     if (checkButton) {
         checkButton.addEventListener('click', checkAccess);
         console.log('Обработчик клика добавлен на кнопку');
     }
 
-    //Блокируем отправку формы 
     if (form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
