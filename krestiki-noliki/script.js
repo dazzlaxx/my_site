@@ -131,7 +131,6 @@
         if (useNewSize) {
             let newSize = parseInt(sizeInput.value);
             if (isNaN(newSize) || newSize < 3) newSize = 3;
-            if (newSize > 8) newSize = 8;
             size = newSize;
             sizeInput.value = size;
         }
@@ -156,6 +155,5 @@
     sizeInput.addEventListener('change', function() {
         let val = parseInt(this.value);
         if (isNaN(val) || val < 3) this.value = 3;
-        if (val > 8) this.value = 8;
     });
 })();
