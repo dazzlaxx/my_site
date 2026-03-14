@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Крестики-нолики</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game">
+        <h1>Крестики-нолики</h1>
+        
+        <div class="controls">
+            <label>
+                Размер поля:
+                <input type="number" id="size" min="3" max="8" value="3">
+            </label>
+            <button id="newGame">Новая игра</button>
+            <button id="reset">Сброс</button>
+        </div>
+
+        <div class="status" id="status">Ход: X</div>
+
+        <div class="board" id="board"></div>
+        
+        <div class="footer">
+            dazzlaxx core
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
