@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="todo-app">
+    <div class="todo-header">
+        <h1>ToDo List</h1>
+        <div class="sub">Список задач</div>
+    </div>
+
+    <div class="add-task-panel">
+        <div class="input-group">
+            <div class="input-field">
+                <label>Название</label>
+                <input type="text" id="taskNameInput" placeholder="Пример: Сделать домашнее задание" autocomplete="off">
+            </div>
+            <div class="input-field">
+                <label>Описание</label>
+                <textarea id="taskDescInput" rows="1" placeholder="Подробности, ссылки или заметки"></textarea>
+            </div>
+        </div>
+        <button class="btn-add" id="addTaskBtn">Добавить задачу</button>
+    </div>
+
+    <div class="todo-list-container">
+        <div class="stats">
+            <span>Всего: <strong id="totalCount">0</strong></span>
+            <span>Выполнено: <strong id="completedCount">0</strong></span>
+            <span>Активных: <strong id="activeCount">0</strong></span>
+        </div>
+        <div id="todoListRoot" class="todo-items"></div>
+    </div>
+    <footer>
+        Данные сохраняются локально | Доступны после перезапуска браузера | dazzlaxx
+    </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
