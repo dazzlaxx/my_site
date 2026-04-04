@@ -2,19 +2,19 @@ const STORAGE_KEY = 'todo_app_list_bauman';
 
 let tasks = [];
 
-const taskNameInput = document.getElementById('taskNameInput');
-const taskDescInput = document.getElementById('taskDescInput');
-const addBtn = document.getElementById('addTaskBtn');
-const todoRoot = document.getElementById('todoListRoot');
-const totalSpan = document.getElementById('totalCount');
-const completedSpan = document.getElementById('completedCount');
-const activeSpan = document.getElementById('activeCount');
+const taskNameInput = document.querySelector('#taskNameInput');
+const taskDescInput = document.querySelector('#taskDescInput');
+const addBtn = document.querySelector('#addTaskBtn');
+const todoRoot = document.querySelector('#todoListRoot');
+const totalSpan = document.querySelector('#totalCount');
+const completedSpan = document.querySelector('#completedCount');
+const activeSpan = document.querySelector('#activeCount');
 
 function saveToLocalStorage() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
     } catch(e) {
-        console.warn('Ошибка локального сохранения', e);
+        console.warn('Ошибка сохранения в localStorage', e);
     }
 }
 
@@ -43,19 +43,19 @@ function loadFromLocalStorage() {
             {
                 id: 'demo1',
                 name: 'Сделать домашнее задание',
-                description: 'ToDo List',
+                description: 'ToDo List с локальным хранилищем',
                 completed: false
             },
             {
                 id: 'demo2',
-                name: 'Изучить локальное хранение',
+                name: 'Изучить localStorage',
                 description: 'Понять, как хранить задачи после перезагрузки',
                 completed: true
             },
             {
                 id: 'demo3',
                 name: 'Добавить новую задачу',
-                description: 'Попробовать создать свою задачу с описанием',
+                description: 'Попробуй создать свою задачу с описанием',
                 completed: false
             }
         ];
@@ -65,25 +65,25 @@ function loadFromLocalStorage() {
 
 function updateStats() {
     const total = tasks.length;
-    const completed = tasks.filter(t=>t.completed).length;
-    const active = total - completed
+    const completed = tasks.filter(t => t.completed === true).length;
+    const active = total - completed;
     totalSpan.textContent = total;
     completedSpan.textContent = completed;
-    activeSpan.textContent = active
+    activeSpan.textContent = active;
 }
 
 function renderTodoList() {
     if (!todoRoot) return;
-
+    
     updateStats();
-
-    if (tasks.length===0) {
-        todoRoot.innerHTML = '<div class="empty-message">Список дел пуст. Добавьте новую задачу.</div>';
-        return
+    
+    if (tasks.length === 0) {
+        todoRoot.innerHTML = '<div class="empty-message">Список дел пуст. Добавьте новую задачу</div>'; .//небезоппмго sethtml
+        return;
     }
-
+    
     const fragment = document.createDocumentFragment();
-
+    
     tasks.forEach(task => {
         const taskDiv = document.createElement('div');
         taskDiv.className = `todo-item ${task.completed ? 'completed-task' : ''}`;
@@ -171,7 +171,7 @@ function addNewTask() {
         completed: false
     };
     
-    tasks.unshift(newTask);
+    tasks.unshift(newTask); //push и развернуть массив, тк это медленно
     saveToLocalStorage();
     
     taskNameInput.value = '';
