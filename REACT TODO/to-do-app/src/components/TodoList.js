@@ -15,21 +15,56 @@ const TodoList = () => {
   }, []);
 
   const fetchTodos = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('https://jsonplaceholder.typicode.com/todos');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setTodos(data.slice(0, 20));
-      setError(null);
-    } catch (err) {
-      setError('Ошибка при загрузке данных: ' + err.message);
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    setError(null);
+    
+    //Используем другой публичный API
+    const response = await fetch('https://dummyjson.com/todos');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
+    
+    const data = await response.json();
+    
+    //Преобразуем данные под наш формат
+    const formattedTodos = data.todos.map(todo => ({
+      id: todo.id,
+      title: todo.todo,
+      completed: todo.completed,
+      userId: todo.userId
+    }));
+    
+    setTodos(formattedTodos.slice(0, 15));
+    setError(null);
+  } catch (err) {
+    console.error('Ошибка загрузки:', err);
+    
+    //Если и этот API не работает, пробуем третий вариант
+    try {
+      const response = await fetch('https://jsonplaceholder.cypress.io/todos');
+      const data = await response.json();
+      setTodos(data.slice(0, 15));
+      setError(null);
+    } catch (secondErr) {
+      //Совсем запасной вариант
+      setError('Работаем с локальными данными');
+      const fallbackTodos = [
+        { id: 1, title: 'Создать красивый дизайн', completed: true, userId: 1 },
+        { id: 2, title: 'Добавить анимации', completed: false, userId: 1 },
+        { id: 3, title: 'Настроить загрузку с сервера', completed: false, userId: 1 },
+        { id: 4, title: 'Сделать утреннюю зарядку', completed: true, userId: 1 },
+        { id: 5, title: 'Прочитать книгу', completed: false, userId: 1 },
+        { id: 6, title: 'Написать отчёт', completed: false, userId: 1 },
+        { id: 7, title: 'Встретиться с друзьями', completed: false, userId: 1 },
+      ];
+      setTodos(fallbackTodos);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   const toggleTodo = (id) => {
     setTodos(todos.map(todo =>
@@ -69,15 +104,7 @@ const TodoList = () => {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
-        <p>Загрузка задач...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-container">
-        <div className="error">{error}</div>
+        <p>Загружаем задачи...</p>
       </div>
     );
   }
@@ -92,16 +119,22 @@ const TodoList = () => {
           </button>
         </div>
 
+        {error && (
+          <div className="info-message">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={addTodo} className="add-todo-form">
           <input
             type="text"
             value={newTodoTitle}
             onChange={(e) => setNewTodoTitle(e.target.value)}
-            placeholder="Добавить новую задачу..."
+            placeholder="Что нужно сделать?"
             className="add-todo-input"
           />
           <button type="submit" className="add-btn">
-            + Добавить
+            Добавить
           </button>
         </form>
 
@@ -122,14 +155,13 @@ const TodoList = () => {
             className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
             onClick={() => setFilter('completed')}
           >
-            Выполненные
+            Завершённые
           </button>
         </div>
 
         <div className="todo-stats">
           <span>Всего: {todos.length}</span>
           <span>Выполнено: {todos.filter(t => t.completed).length}</span>
-          <span>Осталось: {todos.filter(t => !t.completed).length}</span>
         </div>
 
         <ul className="todo-list">
@@ -151,7 +183,7 @@ const TodoList = () => {
                 <button 
                   onClick={() => goToDetail(todo.id)}
                   className="detail-btn"
-                  title="Посмотреть детали"
+                  title="Подробнее"
                 >
                 </button>
                 <button 
@@ -159,7 +191,6 @@ const TodoList = () => {
                   className="delete-btn"
                   title="Удалить"
                 >
-                  🗑️
                 </button>
               </div>
             </li>
@@ -168,7 +199,7 @@ const TodoList = () => {
 
         {filteredTodos.length === 0 && (
           <div className="empty-state">
-            <p>Нет задач</p>
+            <p> Список пуст</p>
           </div>
         )}
       </div>
