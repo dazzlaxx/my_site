@@ -19,11 +19,11 @@ const TodoDetail = () => {
   try {
     setLoading(true);
     
-    //Пробуем основной API
+    // Пробуем основной API
     let response = await fetch(`https://dummyjson.com/todos/${id}`);
     
     if (!response.ok) {
-      //Если не получилось, пробуем запасной
+      // Если не получилось, пробуем запасной
       response = await fetch(`https://jsonplaceholder.cypress.io/todos/${id}`);
     }
     
@@ -33,7 +33,7 @@ const TodoDetail = () => {
     
     const data = await response.json();
     
-    //Приводим к единому формату
+    // Приводим к единому формату
     const todo = {
       id: data.id,
       title: data.todo || data.title,
@@ -48,7 +48,7 @@ const TodoDetail = () => {
     console.error('Ошибка загрузки:', err);
     setError('не удалось загрузить детали задачи');
     
-    //Создаём локальные данные для этой задачи
+    // Создаём локальные данные для этой задачи
     setTodo({
       id: parseInt(id),
       title: `Задача ${id}`,

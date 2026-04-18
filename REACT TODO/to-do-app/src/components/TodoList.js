@@ -15,56 +15,73 @@ const TodoList = () => {
   }, []);
 
   const fetchTodos = async () => {
-  try {
-    setLoading(true);
-    setError(null);
-    
-    //Используем другой публичный API
-    const response = await fetch('https://dummyjson.com/todos');
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    //Преобразуем данные под наш формат
-    const formattedTodos = data.todos.map(todo => ({
-      id: todo.id,
-      title: todo.todo,
-      completed: todo.completed,
-      userId: todo.userId
-    }));
-    
-    setTodos(formattedTodos.slice(0, 15));
-    setError(null);
-  } catch (err) {
-    console.error('Ошибка загрузки:', err);
-    
-    //Если и этот API не работает, пробуем третий вариант
     try {
-      const response = await fetch('https://jsonplaceholder.cypress.io/todos');
-      const data = await response.json();
-      setTodos(data.slice(0, 15));
+      setLoading(true);
       setError(null);
-    } catch (secondErr) {
-      //Совсем запасной вариант
-      setError('Работаем с локальными данными');
+      
+      //Русские задачи для замены
+      const russianTasks = [
+        'Купить продукты',
+        'Позвонить маме',
+        'Сходить в спортзал',
+        'Прочитать книгу',
+        'Написать отчёт',
+        'Встретиться с друзьями',
+        'Оплатить счета',
+        'Записаться к врачу',
+        'Сделать уборку',
+        'Приготовить ужин',
+        'Посмотреть вебинар',
+        'Обновить резюме',
+        'Заказать подарок',
+        'Погулять с собакой',
+        'Медитация 10 минут',
+        'Разобрать почту',
+        'Полить цветы',
+        'Спланировать выходные',
+        'Выучить 10 новых слов',
+        'Сделать зарядку'
+      ];
+      
+      //Пробуем загрузить с сервера
+      const response = await fetch('https://jsonplaceholder.cypress.io/todos');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      //Заменяем английские названия на русские
+      const formattedTodos = data.slice(0, 15).map((todo, index) => ({
+        id: todo.id,
+        title: russianTasks[index % russianTasks.length],
+        completed: todo.completed,
+        userId: todo.userId
+      }));
+      
+      setTodos(formattedTodos);
+      setError(null);
+    } catch (err) {
+      console.error('Ошибка загрузки:', err);
+      setError('Не удалось загрузить задачи с сервера. Используем локальные данные.');
+      
+      //Запасные данные на русском
       const fallbackTodos = [
         { id: 1, title: 'Создать красивый дизайн', completed: true, userId: 1 },
         { id: 2, title: 'Добавить анимации', completed: false, userId: 1 },
         { id: 3, title: 'Настроить загрузку с сервера', completed: false, userId: 1 },
         { id: 4, title: 'Сделать утреннюю зарядку', completed: true, userId: 1 },
         { id: 5, title: 'Прочитать книгу', completed: false, userId: 1 },
-        { id: 6, title: 'Написать отчёт', completed: false, userId: 1 },
-        { id: 7, title: 'Встретиться с друзьями', completed: false, userId: 1 },
+        { id: 6, title: 'Купить продукты', completed: false, userId: 1 },
+        { id: 7, title: 'Позвонить маме', completed: true, userId: 1 },
+        { id: 8, title: 'Сходить в спортзал', completed: false, userId: 1 },
       ];
       setTodos(fallbackTodos);
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const toggleTodo = (id) => {
     setTodos(todos.map(todo =>
@@ -185,12 +202,14 @@ const TodoList = () => {
                   className="detail-btn"
                   title="Подробнее"
                 >
+                  ›
                 </button>
                 <button 
                   onClick={() => deleteTodo(todo.id)}
                   className="delete-btn"
                   title="Удалить"
                 >
+                  ×
                 </button>
               </div>
             </li>
@@ -199,7 +218,7 @@ const TodoList = () => {
 
         {filteredTodos.length === 0 && (
           <div className="empty-state">
-            <p> Список пуст</p>
+            <p>Список пуст</p>
           </div>
         )}
       </div>
