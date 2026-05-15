@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TodoList.css';
 
+const API_URL = 'http://localhost:8080/api';
+
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,92 +21,82 @@ const TodoList = () => {
       setLoading(true);
       setError(null);
       
-      //Русские задачи для замены
-      const russianTasks = [
-        'Купить продукты',
-        'Позвонить маме',
-        'Сходить в спортзал',
-        'Прочитать книгу',
-        'Написать отчёт',
-        'Встретиться с друзьями',
-        'Оплатить счета',
-        'Записаться к врачу',
-        'Сделать уборку',
-        'Приготовить ужин',
-        'Посмотреть вебинар',
-        'Обновить резюме',
-        'Заказать подарок',
-        'Погулять с собакой',
-        'Медитация 10 минут',
-        'Разобрать почту',
-        'Полить цветы',
-        'Спланировать выходные',
-        'Выучить 10 новых слов',
-        'Сделать зарядку'
-      ];
-      
-      //Пробуем загрузить с сервера
-      const response = await fetch('https://jsonplaceholder.cypress.io/todos');
+      const response = await fetch(`${API_URL}/todos`);
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Ошибка: ${response.status}`);
       }
       
       const data = await response.json();
-      
-      //Заменяем английские названия на русские
-      const formattedTodos = data.slice(0, 15).map((todo, index) => ({
-        id: todo.id,
-        title: russianTasks[index % russianTasks.length],
-        completed: todo.completed,
-        userId: todo.userId
-      }));
-      
-      setTodos(formattedTodos);
-      setError(null);
+      setTodos(data);
     } catch (err) {
       console.error('Ошибка загрузки:', err);
-      setError('Не удалось загрузить задачи с сервера. Используем локальные данные.');
-      
-      //Запасные данные на русском
-      const fallbackTodos = [
-        { id: 1, title: 'Создать красивый дизайн', completed: true, userId: 1 },
-        { id: 2, title: 'Добавить анимации', completed: false, userId: 1 },
-        { id: 3, title: 'Настроить загрузку с сервера', completed: false, userId: 1 },
-        { id: 4, title: 'Сделать утреннюю зарядку', completed: true, userId: 1 },
-        { id: 5, title: 'Прочитать книгу', completed: false, userId: 1 },
-        { id: 6, title: 'Купить продукты', completed: false, userId: 1 },
-        { id: 7, title: 'Позвонить маме', completed: true, userId: 1 },
-        { id: 8, title: 'Сходить в спортзал', completed: false, userId: 1 },
-      ];
-      setTodos(fallbackTodos);
+      setError('Не удалось загрузить задачи с сервера');
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleTodo = (id) => {
-    setTodos(todos.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
-  };
-
-  const addTodo = (e) => {
-    e.preventDefault();
-    if (newTodoTitle.trim()) {
-      const newTodo = {
-        id: Date.now(),
-        title: newTodoTitle,
-        completed: false,
-        userId: 1
-      };
-      setTodos([newTodo, ...todos]);
-      setNewTodoTitle('');
+  const toggleTodo = async (id) => {
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return;
+    
+    try {
+      const updatedTodo = { ...todo, completed: !todo.completed };
+      
+      const response = await fetch(`${API_URL}/todos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTodo),
+      });
+      
+      if (response.ok) {
+        setTodos(todos.map(t => t.id === id ? updatedTodo : t));
+      }
+    } catch (err) {
+      console.error('Ошибка обновления:', err);
     }
   };
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  const addTodo = async (e) => {
+    e.preventDefault();
+    if (newTodoTitle.trim()) {
+      try {
+        const newTodo = {
+          title: newTodoTitle,
+          completed: false,
+          userId: 1
+        };
+        
+        const response = await fetch(`${API_URL}/todos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newTodo),
+        });
+        
+        if (response.ok) {
+          const createdTodo = await response.json();
+          setTodos([createdTodo, ...todos]);
+          setNewTodoTitle('');
+        }
+      } catch (err) {
+        console.error('Ошибка добавления:', err);
+      }
+    }
+  };
+
+  const deleteTodo = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/todos/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        setTodos(todos.filter(todo => todo.id !== id));
+      }
+    } catch (err) {
+      console.error('Ошибка удаления:', err);
+    }
   };
 
   const filteredTodos = todos.filter(todo => {
